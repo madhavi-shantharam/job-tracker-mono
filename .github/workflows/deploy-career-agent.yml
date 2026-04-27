@@ -1,0 +1,30 @@
+name: Deploy Career Agent to AWS ECS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'career-agent/**'
+      - '.github/workflows/deploy-career-agent.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        working-directory: career-agent
+
+      - name: Run tests
+        run: pytest tests/ -v
+        working-directory: career-agent
+
+      # Docker build + ECR push + ECS deploy steps
+      # (to be completed in Session 5 of the career-agent build)
