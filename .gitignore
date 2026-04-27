@@ -1,18 +1,4 @@
-# ─── Backend (Spring Boot) ───────────────────────────────
-backend/target/
-backend/.env
-backend/.env.aws
-backend/application-local.properties
-backend/docker-volumes/
-
-# ─── Frontend (React) ────────────────────────────────────
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/.env.production
-
-# ─── Career Agent (Python) ───────────────────────────────
+# Python (career-agent)
 career-agent/venv/
 career-agent/__pycache__/
 career-agent/**/__pycache__/
@@ -20,18 +6,15 @@ career-agent/.env
 career-agent/credentials.json
 career-agent/*.pyc
 
-# ─── IDE / Editor ────────────────────────────────────────
-.idea/
-*.iml
-.vscode/
+# Java (backend)
+backend/target/
+backend/.env
 
-# ─── Java ────────────────────────────────────────────────
-*.class
+# Node (frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
 
-# ─── Logs ────────────────────────────────────────────────
-*.log
-logs/
-
-# ─── OS ──────────────────────────────────────────────────
+# OS
 .DS_Store
-Thumbs.db
