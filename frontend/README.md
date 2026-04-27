@@ -47,3 +47,4 @@ src/
 ## Related
 
 Backend repository: https://github.com/madhavi-shantharam/job-tracker
+# monorepo
