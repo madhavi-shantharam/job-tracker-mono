@@ -1,24 +1,37 @@
-# Maven build output
-target/
+# ─── Backend (Spring Boot) ───────────────────────────────
+backend/target/
+backend/.env
+backend/.env.aws
+backend/application-local.properties
+backend/docker-volumes/
 
-# IDE files
+# ─── Frontend (React) ────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# ─── Career Agent (Python) ───────────────────────────────
+career-agent/venv/
+career-agent/__pycache__/
+career-agent/**/__pycache__/
+career-agent/.env
+career-agent/credentials.json
+career-agent/*.pyc
+
+# ─── IDE / Editor ────────────────────────────────────────
 .idea/
 *.iml
 .vscode/
+
+# ─── Java ────────────────────────────────────────────────
 *.class
 
-# Spring Boot local config — contains secrets
-application-local.properties
-.env
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
+# ─── Logs ────────────────────────────────────────────────
 *.log
 logs/
 
-# Docker volumes
-docker-volumes/
-.env.aws
+# ─── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
