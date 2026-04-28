@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import ApplicationForm from './pages/ApplicationForm';
 import AnalyzePage from './pages/AnalyzePage';
 import ResumesPage from './pages/ResumesPage';
+import EmailImportPage from './pages/EmailImportPage';
 
 export default function App() {
   return (
@@ -16,7 +17,8 @@ export default function App() {
             <Route path="/add"       element={<ApplicationForm />} />
             <Route path="/edit/:id"  element={<ApplicationForm />} />
             <Route path="/analyze"   element={<AnalyzePage />} />
-            <Route path="/resumes"   element={<ResumesPage />} />
+            <Route path="/resumes"       element={<ResumesPage />} />
+            <Route path="/email-import"  element={<EmailImportPage />} />
           </Routes>
         </main>
       </div>
