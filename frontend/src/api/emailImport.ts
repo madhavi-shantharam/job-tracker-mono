@@ -43,6 +43,7 @@ export const getImportedApplications = async (): Promise<ImportedApplication[]> 
 };
 
 // Backend endpoint not yet implemented — returns mock zeros on 404/error.
+// Triggers a Gmail poll cycle via Spring Boot → Python subprocess.
 export const triggerPollNow = async (): Promise<PollSummary> => {
   try {
     const res = await axios.post<PollSummary>('/api/email-import/poll');

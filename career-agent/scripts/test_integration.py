@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import json
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -25,6 +26,8 @@ def main():
         print("\nIngestion log stats:")
         for key, value in stats.items():
             print(f"  {key}: {value}")
+
+        print(json.dumps(summary))
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
