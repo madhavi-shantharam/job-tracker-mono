@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { getImportedApplications, triggerPollNow, getIngestionStats } from '../api/emailImport';
 import type { ImportedApplication } from '../api/emailImport';
 import StatusBadge from '../components/StatusBadge';
@@ -57,15 +58,13 @@ export default function EmailImportPage() {
     setPollMessage(null);
     try {
       const summary = await triggerPollNow();
-      const isReal = summary.fetched > 0 || summary.created > 0 || summary.errors > 0;
       setPollMessage(
-        isReal
-          ? `Poll complete: ${summary.created} created, ${summary.duplicate} duplicate, ${summary.skipped} skipped.`
-          : 'Polling not yet available — backend endpoint coming soon.'
+        `Poll complete: ${summary.created} created, ${summary.duplicate} duplicate, ${summary.skipped} skipped.`
       );
       await fetchApplications();
-    } catch {
-      setPollMessage('Failed to trigger poll.');
+    } catch (err) {
+      const backendMessage = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setPollMessage(backendMessage ?? 'Failed to trigger poll.');
     } finally {
       setPolling(false);
     }
