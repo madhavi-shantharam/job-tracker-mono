@@ -32,8 +32,11 @@ class GmailPoller:
 
         try:
             # Step 1 — Fetch
+            # Gmail's messages.list supports up to 500 per call, so a single
+            # request comfortably covers the current ~200 matching messages
+            # without needing to paginate via nextPageToken.
             messages = self._gmail_client.list_recent_messages(
-                max_results=50, query=self._gmail_query
+                max_results=300, query=self._gmail_query
             )
 
             # Step 2 — Filter by subject/sender heuristics
