@@ -7,6 +7,17 @@ on:
       - 'career-agent/**'
       - '.github/workflows/deploy-career-agent.yml'
 
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-west-2
+  ECR_REPOSITORY: job-tracker-career-agent
+  ECS_CLUSTER: job-tracker-cluster
+  ECS_SERVICE: job-tracker-career-agent-service
+  CONTAINER_NAME: job-tracker-career-agent
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,5 +37,55 @@ jobs:
         run: pytest tests/ -v
         working-directory: career-agent
 
-      # Docker build + ECR push + ECS deploy steps
-      # (to be completed in Session 5 of the career-agent build)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::832496385907:role/job-tracker-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Write Gmail OAuth client file
+        run: echo "$GMAIL_CREDENTIALS_JSON" > career-agent/credentials.json
+        env:
+          GMAIL_CREDENTIALS_JSON: ${{ secrets.GMAIL_CREDENTIALS_JSON }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker buildx create --use
+          docker buildx build \
+            --platform linux/amd64 \
+            --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            --push \
+            ./career-agent
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $CONTAINER_NAME \
+            --query taskDefinition \
+            > task-definition.json
+
+      - name: Update task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
