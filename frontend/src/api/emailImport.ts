@@ -20,17 +20,6 @@ export interface IngestionStats {
   error: number;
 }
 
-export interface PollSummary {
-  fetched: number;
-  filtered: number;
-  new: number;
-  created: number;
-  duplicate: number;
-  skipped: number;
-  errors: number;
-  timestamp: string;
-}
-
 export const getImportedApplications = async (): Promise<ImportedApplication[]> => {
   const res = await axios.get<ImportedApplication[]>(BASE);
   return res.data
@@ -40,13 +29,6 @@ export const getImportedApplications = async (): Promise<ImportedApplication[]> 
       if (!b.appliedDate) return -1;
       return new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime();
     });
-};
-
-// Triggers a Gmail poll cycle via Spring Boot → Python subprocess.
-// Errors propagate to the caller so the real failure reason can be shown.
-export const triggerPollNow = async (): Promise<PollSummary> => {
-  const res = await axios.post<PollSummary>('/api/email-import/poll');
-  return res.data;
 };
 
 // Pure function — computes stats from the in-memory list.

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { getImportedApplications, triggerPollNow, getIngestionStats } from '../api/emailImport';
+import { getImportedApplications, getIngestionStats } from '../api/emailImport';
 import type { ImportedApplication } from '../api/emailImport';
 import StatusBadge from '../components/StatusBadge';
 import StatsCard from '../components/StatsCard';
@@ -35,8 +34,6 @@ export default function EmailImportPage() {
   const [applications, setApplications] = useState<ImportedApplication[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState<string | null>(null);
-  const [polling,      setPolling]      = useState(false);
-  const [pollMessage,  setPollMessage]  = useState<string | null>(null);
 
   useEffect(() => { fetchApplications(); }, []);
 
@@ -53,23 +50,6 @@ export default function EmailImportPage() {
     }
   };
 
-  const handlePollNow = async () => {
-    setPolling(true);
-    setPollMessage(null);
-    try {
-      const summary = await triggerPollNow();
-      setPollMessage(
-        `Poll complete: ${summary.created} created, ${summary.duplicate} duplicate, ${summary.skipped} skipped.`
-      );
-      await fetchApplications();
-    } catch (err) {
-      const backendMessage = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      setPollMessage(backendMessage ?? 'Failed to trigger poll.');
-    } finally {
-      setPolling(false);
-    }
-  };
-
   const stats = getIngestionStats(applications);
 
   if (loading) return <LoadingState />;
@@ -79,35 +59,11 @@ export default function EmailImportPage() {
     <div className="max-w-6xl mx-auto px-6 py-8">
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">📧 Email Import</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Applications automatically imported from Gmail confirmation emails
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <button
-            onClick={handlePollNow}
-            disabled={polling}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 flex items-center gap-2"
-          >
-            {polling ? (
-              <>
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                Polling…
-              </>
-            ) : (
-              'Poll Now'
-            )}
-          </button>
-          {pollMessage && (
-            <p className="text-sm text-gray-500 text-right max-w-xs">{pollMessage}</p>
-          )}
-        </div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">📧 Email Import</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Applications automatically imported from Gmail confirmation emails
+        </p>
       </div>
 
       {/* Stats Row */}
